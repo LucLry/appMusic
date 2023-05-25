@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,17 +27,36 @@ public class MusicApi {
     private MusicService musicService;
 
     //Same thing as @AutoWired
-    MusicApi(MusicService musicService){
+    MusicApi(MusicService musicService) {
         this.musicService = musicService;
     }
+
     MultiValueMap<String, String> bodyValues = new LinkedMultiValueMap<>();
 
     WebClient spotifyClient = WebClient.create("https://api.spotify.com");
 
     @GetMapping("/getToken")
-    public String getSpotifyToken()  {
+    public String getSpotifyToken() {
         try {
             return musicService.getSpotifyToken();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/getArtist/{spotifyArtistId}")
+    public JsonNode getArtist(@PathVariable String spotifyArtistId) {
+        try {
+            return musicService.getSpotifyArtistById(spotifyArtistId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/getUser/{spotifyUserId}")
+    public JsonNode getSpotifyUser(@PathVariable String spotifyUserId) {
+        try {
+            return musicService.getSpotifyUserProfile(spotifyUserId);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

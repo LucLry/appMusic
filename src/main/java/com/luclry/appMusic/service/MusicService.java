@@ -23,17 +23,19 @@ public class MusicService {
 
 
     /**
-     *
-     * @return {JsonNode}
+     * @return {String} spotify token to be used by other WS
      * @throws Exception
+     * @Set values for {Date} spotifyTokenExpirationDate  and {String} spotifyToken
+     *
      */
     public String getSpotifyToken() throws Exception {
 
-        MultiValueMap<String, String> bodyValues = new LinkedMultiValueMap<>();
+        if (spotifyToken == null || spotifyTokenExpirationDate.before(new Date())) {
+            MultiValueMap<String, String> bodyValues = new LinkedMultiValueMap<>();
 
-        bodyValues.add("grant_type", "client_credentials");
-        bodyValues.add("client_id", clientId);
-        bodyValues.add("client_secret", clientSecret);
+            bodyValues.add("grant_type", "client_credentials");
+            bodyValues.add("client_id", clientId);
+            bodyValues.add("client_secret", clientSecret);
 
             JsonNode response = spotifyClient.post()
                     .uri(new URI("https://accounts.spotify.com/api/token"))
@@ -45,7 +47,30 @@ public class MusicService {
                     .block();
 
             spotifyToken = response.get("access_token").asText();
-            spotifyTokenExpirationDate = new Date((new Date ()).getTime() + response.get("expires_in").asInt() *1000);
-               return spotifyToken;
+            spotifyTokenExpirationDate = new Date((new Date()).getTime() + response.get("expires_in").asInt() * 1000);
+        }
+
+        return spotifyToken;
+    }
+
+    public JsonNode getSpotifyArtistById(String spotifyArtistId) throws Exception {
+
+        JsonNode response = spotifyClient.get()
+                .uri("/v1/artists/" + spotifyArtistId)
+                .header("Authorization", "Bearer " + getSpotifyToken())
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
+        return response;
+    }
+
+    public JsonNode getSpotifyUserProfile(String spotifyUserId) throws Exception{
+        JsonNode response = spotifyClient.get()
+                .uri("/v1/users/" + spotifyUserId)
+                .header("Authorization", "Bearer " + getSpotifyToken())
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
+        return response;
     }
 }

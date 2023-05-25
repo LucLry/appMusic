@@ -11,9 +11,14 @@ public class AppMusicApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AppMusicApplication.class, args);
 		System.out.println("app launched");
-		System.out.println("current " + new Date());
-		System.out.println("1 more hour " + new Date((new Date ()).getTime() + 3600 *1000));
 
 	}
 
 }
+
+/**
+ * Artists :
+ * 		The Beatles : 3WrFJ7ztbogyGnTHbHJFl2
+ *
+ *
+ */
