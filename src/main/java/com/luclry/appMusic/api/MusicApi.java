@@ -35,17 +35,8 @@ public class MusicApi {
 
     WebClient spotifyClient = WebClient.create("https://api.spotify.com");
 
-    @GetMapping("/getToken")
-    public String getSpotifyToken() {
-        try {
-            return musicService.getSpotifyToken();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @GetMapping("/getArtist/{spotifyArtistId}")
-    public JsonNode getArtist(@PathVariable String spotifyArtistId) {
+    public JsonNode getArtistById(@PathVariable String spotifyArtistId) {
         try {
             return musicService.getSpotifyArtistById(spotifyArtistId);
         } catch (Exception e) {
@@ -54,9 +45,9 @@ public class MusicApi {
     }
 
     @GetMapping("/getUser/{spotifyUserId}")
-    public JsonNode getSpotifyUser(@PathVariable String spotifyUserId) {
+    public JsonNode getSpotifyUserById(@PathVariable String spotifyUserId) {
         try {
-            return musicService.getSpotifyUserProfile(spotifyUserId);
+            return musicService.getSpotifyUserProfileById(spotifyUserId);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
