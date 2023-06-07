@@ -7,15 +7,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -35,11 +35,12 @@ public class MusicApi {
 
     WebClient spotifyClient = WebClient.create("https://api.spotify.com");
 
-    @GetMapping("/getArtist/{spotifyArtistId}")
-    public JsonNode getArtistById(@PathVariable String spotifyArtistId) {
+    @GetMapping("/getArtist")
+    public JsonNode getArtistById(@RequestParam ArrayList<String> spotifyArtistIdList) {
         try {
-            return musicService.getSpotifyArtistById(spotifyArtistId);
+            return musicService.getSpotifyArtistById(spotifyArtistIdList);
         } catch (Exception e) {
+            System.out.println("Erreur : " + e);
             throw new RuntimeException(e);
         }
     }
@@ -49,6 +50,15 @@ public class MusicApi {
         try {
             return musicService.getSpotifyUserProfileById(spotifyUserId);
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/getToken")
+    public String getToken(){
+        try{
+            return musicService.getSpotifyToken();
+        }catch (Exception e){
             throw new RuntimeException(e);
         }
     }
