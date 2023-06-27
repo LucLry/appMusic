@@ -2,19 +2,19 @@ package com.luclry.appMusic.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.luclry.appMusic.model.Artist;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.yaml.snakeyaml.events.CollectionEndEvent;
+
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 
 @Service
@@ -105,26 +105,51 @@ public class MusicService {
                 .block();
         return response;
     }
-    public JsonNode getSpotifyArtistById(List<String> spotifyArtistIdList) throws Exception {
+
+        public List<Artist> getSpotifyArtistById(List<String> spotifyArtistIdList) throws Exception {
         Set<String> spotifyArtistIdSet = new HashSet<>(spotifyArtistIdList);
 
         ObjectMapper mapper = new ObjectMapper();
-        ArrayNode resultArray = mapper.createArrayNode();
 
         List<Set<String>> artistSubsets = splitSetIntoSubsets(spotifyArtistIdSet, maxIdsForOneGet);
 
+        List<Artist> artistList = new ArrayList<Artist>();
+
         for (int i = 0; i < artistSubsets.size(); i++){
             String spotifyArtistIds = String.join(",", artistSubsets.get(i));
-            JsonNode response = spotifyGetRequest("/artists?ids=" + spotifyArtistIds);
 
-            resultArray.addAll((ArrayNode) response.get("artists")); // addAll merges response array into resultArray
+            JsonNode response = spotifyGetRequest("/artists?ids=" + spotifyArtistIds);
+            List<Artist> bufferList = mapper.readValue(response.get("artists").toString(), new TypeReference<List<Artist>>(){}); // Convert Json array to a list of artists
+
+            artistList.addAll(bufferList); // addAll merges response array into resultArray
         }
 
         ObjectNode resFinal = mapper.createObjectNode();
-        resFinal.put("artists", resultArray);
+        resFinal.put("artists", artistList.toString());
 
-        return resFinal;
+        return artistList;
     }
+
+//    public JsonNode getSpotifyArtistById(List<String> spotifyArtistIdList) throws Exception {
+//        Set<String> spotifyArtistIdSet = new HashSet<>(spotifyArtistIdList);
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//        ArrayNode resultArray = mapper.createArrayNode();
+//
+//        List<Set<String>> artistSubsets = splitSetIntoSubsets(spotifyArtistIdSet, maxIdsForOneGet);
+//
+//        for (int i = 0; i < artistSubsets.size(); i++){
+//            String spotifyArtistIds = String.join(",", artistSubsets.get(i));
+//            JsonNode response = spotifyGetRequest("/artists?ids=" + spotifyArtistIds);
+//
+//            resultArray.addAll((ArrayNode) response.get("artists")); // addAll merges response array into resultArray
+//        }
+//
+//        ObjectNode resFinal = mapper.createObjectNode();
+//        resFinal.put("artists", resultArray);
+//
+//        return resFinal;
+//    }
 
     public JsonNode ExpectedAnswer(List<String> spotifyArtistIdList) throws Exception {
         Set<String> spotifyArtistIdSet = new HashSet<>(spotifyArtistIdList);

@@ -1,27 +1,19 @@
 package com.luclry.appMusic.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.luclry.appMusic.model.Artist;
 import com.luclry.appMusic.service.MusicService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin
 public class MusicApi {
-
 
     // declare musicService bean
 
@@ -37,11 +29,11 @@ public class MusicApi {
     WebClient spotifyClient = WebClient.create("https://api.spotify.com");
 
     @GetMapping("/getArtist")
-    public JsonNode getArtistById(@RequestParam ArrayList<String> spotifyArtistIdList) {
+    public List<Artist> getArtistById(@RequestParam ArrayList<String> spotifyArtistIdList) {
         try {
             return musicService.getSpotifyArtistById(spotifyArtistIdList);
         } catch (Exception e) {
-            System.out.println("Erreur : " + e);
+            System.out.println("Mistakes were made " + e);
             throw new RuntimeException(e);
         }
     }
